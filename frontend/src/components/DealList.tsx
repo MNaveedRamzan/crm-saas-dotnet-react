@@ -1,42 +1,51 @@
-import { useEffect, useState } from "react";
-import api from "../api";
+import type { Deal } from "../types";
 
-type Deal = {
-  id: number;
-  title: string;
-  amount: number;
-  status: number;
-  customerName?: string;
-};
+const statusCopy = {
+  0: { label: "New", tone: "neutral" },
+  1: { label: "In progress", tone: "warning" },
+  2: { label: "Won", tone: "success" },
+  3: { label: "Lost", tone: "muted" },
+} as const;
 
-export function DealList() {
-  const [data, setData] = useState<Deal[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  data: Deal[];
+  loading: boolean;
+  error: string | null;
+}
 
-  useEffect(() => {
-    api.get<Deal[]>("/deals")
-      .then(res => setData(res.data))
-      .finally(() => setLoading(false));
-  }, []);
+const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
-  if (loading) return <p>Loading deals...</p>;
+export function DealList({ data, loading, error }: Props) {
+  if (loading) return <p className="muted">Loading deals...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <div>
-      <h2>Deals</h2>
+    <div className="table-card">
       <table>
         <thead>
           <tr>
-            <th>Title</th><th>Customer</th><th>Amount</th><th>Status</th>
+            <th>Title</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {data.map(d => (
-            <tr key={d.id}>
-              <td>{d.title}</td>
-              <td>{d.customerName}</td>
-              <td>{d.amount}</td>
-              <td>{d.status}</td>
+          {data.map(deal => (
+            <tr key={deal.id}>
+              <td>
+                <div className="cell-stack">
+                  <strong>{deal.title}</strong>
+                  <span className="muted">ID #{deal.id}</span>
+                </div>
+              </td>
+              <td>{deal.customerName}</td>
+              <td>{currency.format(deal.amount)}</td>
+              <td>
+                <span className={`pill ${statusCopy[deal.status].tone}`}>
+                  {statusCopy[deal.status].label}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>

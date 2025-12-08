@@ -1,44 +1,42 @@
-import { useEffect, useState } from "react";
-import api from "../api";
+import type { Customer } from "../types";
 
-type Customer = {
-  id: number;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  dealsCount: number;
-};
+interface Props {
+  data: Customer[];
+  loading: boolean;
+  error: string | null;
+}
 
-export function CustomerList() {
-  const [data, setData] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.get<Customer[]>("/customers")
-      .then(res => setData(res.data))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <p>Loading customers...</p>;
+export function CustomerList({ data, loading, error }: Props) {
+  if (loading) return <p className="muted">Loading customers...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <div>
-      <h2>Customers</h2>
+    <div className="table-card">
       <table>
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Deals</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Company</th>
+            <th>Deals</th>
           </tr>
         </thead>
         <tbody>
-          {data.map(c => (
-            <tr key={c.id}>
-              <td>{c.name}</td>
-              <td>{c.email}</td>
-              <td>{c.phone}</td>
-              <td>{c.company}</td>
-              <td>{c.dealsCount}</td>
+          {data.map(customer => (
+            <tr key={customer.id}>
+              <td>
+                <div className="cell-stack">
+                  <strong>{customer.name}</strong>
+                  <span className="muted">ID #{customer.id}</span>
+                </div>
+              </td>
+              <td>{customer.email}</td>
+              <td>{customer.phone}</td>
+              <td>{customer.company}</td>
+              <td>
+                <span className="pill neutral">{customer.dealsCount} deals</span>
+              </td>
             </tr>
           ))}
         </tbody>
