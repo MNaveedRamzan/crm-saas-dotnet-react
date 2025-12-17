@@ -1,10 +1,13 @@
+﻿using CrmSaas.Application.Common;
 using CrmSaas.Application.Deals;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CrmSaas.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class DealsController : ControllerBase
 {
     private readonly IDealService _service;
@@ -15,9 +18,15 @@ public class DealsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<DealDto>>> GetAll()
+    public async Task<ActionResult<PagedResult<DealDto>>> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int? customerId = null,
+        [FromQuery] int? status = null,
+        [FromQuery] string? q = null
+    )
     {
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetPagedAsync(page, pageSize, customerId, status, q);
         return Ok(result);
     }
 
@@ -29,11 +38,12 @@ public class DealsController : ControllerBase
         return Ok(result);
     }
 
+    // ✅ Return created DealDto for optimistic UI
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] DealCreateRequest request)
+    public async Task<ActionResult<DealDto>> Create([FromBody] DealCreateRequest request)
     {
-        var id = await _service.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id }, null);
+        var deal = await _service.CreateAndReturnAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = deal.Id }, deal);
     }
 
     [HttpPatch("{id:int}/status")]

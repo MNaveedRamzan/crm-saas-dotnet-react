@@ -105,7 +105,7 @@ namespace CrmSaas.Infrastructure.Migrations
                         {
                             Id = 1,
                             Amount = 5000m,
-                            CreatedAt = new DateTime(2025, 12, 8, 21, 45, 56, 258, DateTimeKind.Utc).AddTicks(3348),
+                            CreatedAt = new DateTime(2025, 12, 9, 22, 55, 32, 379, DateTimeKind.Utc).AddTicks(7515),
                             CustomerId = 1,
                             Status = 0,
                             Title = "Website Redesign"
@@ -114,11 +114,43 @@ namespace CrmSaas.Infrastructure.Migrations
                         {
                             Id = 2,
                             Amount = 12000m,
-                            CreatedAt = new DateTime(2025, 12, 8, 21, 45, 56, 258, DateTimeKind.Utc).AddTicks(3359),
+                            CreatedAt = new DateTime(2025, 12, 9, 22, 55, 32, 379, DateTimeKind.Utc).AddTicks(7524),
                             CustomerId = 2,
                             Status = 1,
                             Title = "SaaS Subscription"
                         });
+                });
+
+            modelBuilder.Entity("CrmSaas.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("CrmSaas.Domain.Entities.Deal", b =>

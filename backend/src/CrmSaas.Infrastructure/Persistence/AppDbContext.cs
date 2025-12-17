@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Deal> Deals => Set<Deal>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

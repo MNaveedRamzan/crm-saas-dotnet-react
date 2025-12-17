@@ -1,10 +1,12 @@
 using CrmSaas.Application.Customers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CrmSaas.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _service;
