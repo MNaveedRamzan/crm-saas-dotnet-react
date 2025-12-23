@@ -1,29 +1,38 @@
 # CRM SaaS – .NET 8 + React
 
-A **minimal but production-style CRM SaaS demo** built with **ASP.NET Core (.NET 8)** and **React (Vite + TypeScript)**.
+A **production-style CRM SaaS demo** built with **ASP.NET Core (.NET 8)** and **React (Vite + TypeScript)**.
 
-This project demonstrates:
+This project demonstrates how to build a clean, scalable full‑stack application using modern .NET and React best practices, including authentication, pagination, filtering, and a dashboard.
+
+---
+
+## ✨ Key Highlights
+
 - Clean layered backend architecture
-- EF Core with SQL Server
-- JWT authentication
+- JWT authentication (login / register)
 - Server-side pagination & filtering
-- A modern React frontend consuming the API
+- Optimistic UI updates
+- Dashboard with charts
+- React + TypeScript + Tailwind
+- EF Core with SQL Server
+- Swagger-enabled API
 
 ---
 
 ## 🏗 Architecture
 
-### Backend (`./backend`)
-- **CrmSaas.Api** – ASP.NET Core Web API (controllers, auth, Swagger)
+### Backend (`/backend`)
+- **CrmSaas.Api** – ASP.NET Core Web API, controllers, authentication, Swagger
 - **CrmSaas.Application** – DTOs, request models, service interfaces
-- **CrmSaas.Domain** – Entities & enums (Customer, Deal, DealStatus)
-- **CrmSaas.Infrastructure** – EF Core AppDbContext, service implementations
+- **CrmSaas.Domain** – Core entities & enums (`Customer`, `Deal`, `DealStatus`)
+- **CrmSaas.Infrastructure** – EF Core `AppDbContext`, migrations, services
 
-### Frontend (`./frontend`)
+### Frontend (`/frontend`)
 - React + TypeScript (Vite)
 - Feature-based folder structure
 - Axios API client with interceptors
-- Protected routes (JWT)
+- JWT protected routes
+- Tailwind CSS UI
 
 ---
 
@@ -47,44 +56,49 @@ This project demonstrates:
 
 ## ✨ Features
 
-### Authentication
-- Login / Register
+### 🔐 Authentication
+- Login & Register
 - JWT-based authentication
 - Protected routes
 - Clean error handling (no page refresh on login failure)
+- Password always cleared on error, email retained
 
-### Customers
+### 👥 Customers
 - List customers
 - View customer details
-- Shows:
+- Displays:
   - Name
   - Email
   - Phone
   - Company
   - Associated deals
 
-### Deals
+### 💼 Deals
 - Create new deals
-- List deals with **server-side pagination**
+- Server-side pagination
 - Filters:
   - Search (title / customer)
   - Customer
   - Status
-- Inline **status update** (optimistic UI)
-- Pagination controls:
-  - Page navigation
-  - Page size: `10 / 25 / 50 / 100`
+- Inline status update (optimistic UI)
+- Pagination options: 10 / 25 / 50 / 100
 
-### Dashboard
+### 📊 Dashboard
 - Total deals count
 - Total revenue
 - Deals by status chart
 - Top customers by revenue
 
-### Seed Data
-Initial seed data is added via **EF Core model seeding**:
-- Customers: *Acme Corp*, *Global Tech*
-- Sample deals for demo purposes
+### 🌱 Seed Data
+Initial seed data is added using EF Core model seeding:
+- Customers: Acme Corp, Global Tech
+- Sample deals for demo/testing
+
+---
+
+## 📸 Screenshots
+
+Screenshots are available in the `/screenshots` folder.
 
 ---
 
@@ -104,7 +118,7 @@ cd crm-saas-dotnet-react
 cd backend
 ```
 
-### 2️⃣ Run migrations
+### 2️⃣ Run database migrations
 
 #### Option A: Visual Studio (PMC – Recommended)
 ```powershell
@@ -114,13 +128,9 @@ Update-Database -StartupProject CrmSaas.Api -Project CrmSaas.Infrastructure
 
 #### Option B: dotnet-ef CLI
 ```bash
-dotnet ef migrations add InitialCreate \
-  -s src/CrmSaas.Api/CrmSaas.Api.csproj \
-  -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
+dotnet ef migrations add InitialCreate   -s src/CrmSaas.Api/CrmSaas.Api.csproj   -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
 
-dotnet ef database update \
-  -s src/CrmSaas.Api/CrmSaas.Api.csproj \
-  -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
+dotnet ef database update   -s src/CrmSaas.Api/CrmSaas.Api.csproj   -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
 ```
 
 ### 3️⃣ Run the API
@@ -128,7 +138,7 @@ dotnet ef database update \
 dotnet run --project src/CrmSaas.Api/CrmSaas.Api.csproj
 ```
 
-Swagger UI:
+Swagger:
 ```
 https://localhost:<port>/swagger
 ```
@@ -143,7 +153,7 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
+Frontend URL:
 ```
 http://localhost:5173
 ```
@@ -157,12 +167,6 @@ http://localhost:5173
 const apiBaseUrl = "https://localhost:7040/api";
 ```
 
----
 
-## 📌 Project Status
-This project is intended as:
-- A **portfolio / demo CRM**
-- A reference for clean .NET + React architecture
-- A base for extending into a full SaaS (roles, billing, audit logs, etc.)
-
-
+## 📜 License
+MIT
