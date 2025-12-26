@@ -2,7 +2,7 @@
 
 A **production-style CRM SaaS demo** built with **ASP.NET Core (.NET 8)** and **React (Vite + TypeScript)**.
 
-This project demonstrates how to build a clean, scalable full‑stack application using modern .NET and React best practices, including authentication, pagination, filtering, and a dashboard.
+This project demonstrates how to build a clean, scalable full-stack application using modern .NET and React best practices, including authentication, pagination, filtering, and a dashboard.
 
 ---
 
@@ -98,38 +98,49 @@ Initial seed data is added using EF Core model seeding:
 
 ## 📸 Screenshots
 
-Screenshots are available in the `/screenshots` folder.
+Screenshots are available in the `/screenshots` folder:
+- Login & Register
+- Dashboard
+- Customers & Deals
+- Customer Detail view
 
 ---
 
 ## 🚀 Getting Started
 
-## 🐳 Run with Docker (Recommended)
-
-This project is fully dockerized and can be run with a single command.
-
-### Prerequisites
-- Docker Desktop installed
-- Docker engine running (Linux containers)
-
-### Start the full stack
-From the repository root:
-
-```bash
-docker compose up --build
-
-
 ### 1️⃣ Clone the repository
 ```bash
 git clone https://github.com/MNaveedRamzan/crm-saas-dotnet-react.git
 cd crm-saas-dotnet-react
-```
+🐳 Run with Docker (Recommended)
+
+This project is fully dockerized and can be run with a single command.
+
+Prerequisites
+
+Docker Desktop installed
+
+Docker engine running (Linux containers)
+
+Start the full stack
+
+From the repository root:
+
+docker compose up --build
+
 Open in browser
 
 Frontend: http://localhost:5173
 
 API (Swagger): http://localhost:5240/swagger
----
+
+Stop containers
+docker compose down
+
+Reset database (clean start)
+docker compose down -v
+
+
 Docker setup includes:
 
 ASP.NET Core .NET 8 API
@@ -138,68 +149,51 @@ React frontend served via Nginx
 
 SQL Server container
 
-Replace that section with:
-## 🔧 Configuration
+⚙ Backend Setup (Without Docker)
+cd backend
+
+Run database migrations
+Option A: Visual Studio (PMC – Recommended)
+Add-Migration InitialCreate -StartupProject CrmSaas.Api -Project CrmSaas.Infrastructure
+Update-Database -StartupProject CrmSaas.Api -Project CrmSaas.Infrastructure
+
+Option B: dotnet-ef CLI
+dotnet ef migrations add InitialCreate \
+  -s src/CrmSaas.Api/CrmSaas.Api.csproj \
+  -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
+
+dotnet ef database update \
+  -s src/CrmSaas.Api/CrmSaas.Api.csproj \
+  -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
+
+Run the API
+dotnet run --project src/CrmSaas.Api/CrmSaas.Api.csproj
+
+
+Swagger:
+
+https://localhost:<port>/swagger
+
+🎨 Frontend Setup (Without Docker)
+cd frontend
+npm install
+npm run dev
+
+
+Frontend URL:
+
+http://localhost:5173
+
+🔧 Configuration
 
 The frontend uses environment variables for API configuration.
 
-```env
 VITE_API_BASE_URL=http://localhost:5240/api
 
 
-## ⚙ Backend Setup
+This allows seamless switching between local and Docker environments.
 
-```bash
-cd backend
-```
+👤 Author
 
-### 2️⃣ Run database migrations
-
-#### Option A: Visual Studio (PMC – Recommended)
-```powershell
-Add-Migration InitialCreate -StartupProject CrmSaas.Api -Project CrmSaas.Infrastructure
-Update-Database -StartupProject CrmSaas.Api -Project CrmSaas.Infrastructure
-```
-
-#### Option B: dotnet-ef CLI
-```bash
-dotnet ef migrations add InitialCreate   -s src/CrmSaas.Api/CrmSaas.Api.csproj   -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
-
-dotnet ef database update   -s src/CrmSaas.Api/CrmSaas.Api.csproj   -p src/CrmSaas.Infrastructure/CrmSaas.Infrastructure.csproj
-```
-
-### 3️⃣ Run the API
-```bash
-dotnet run --project src/CrmSaas.Api/CrmSaas.Api.csproj
-```
-
-Swagger:
-```
-https://localhost:<port>/swagger
-```
-
----
-
-## 🎨 Frontend Setup
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-Frontend URL:
-```
-http://localhost:5173
-```
-
----
-
-## 🔧 Configuration
-
-```ts
-// src/lib/apiClient.ts
-const apiBaseUrl = "https://localhost:7040/api";
-```
-
-
+Naveed Ramzan
+GitHub: https://github.com/MNaveedRamzan
