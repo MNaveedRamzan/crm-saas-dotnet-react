@@ -1,4 +1,5 @@
 ﻿using CrmSaas.Application.Common;
+using CrmSaas.Domain.Enums;
 
 namespace CrmSaas.Application.Deals;
 
@@ -20,5 +21,7 @@ public interface IDealService
     // ✅ NEW: returns created DealDto (for optimistic UI)
     Task<DealDto> CreateAndReturnAsync(DealCreateRequest request);
 
-    Task UpdateStatusAsync(int id, DealStatusUpdateRequest request);
+    //Task UpdateStatusAsync(int id, DealStatusUpdateRequest request);
+
+    Task<DealDto?> UpdateStatusAsync(int id, DealStatus status);
 }

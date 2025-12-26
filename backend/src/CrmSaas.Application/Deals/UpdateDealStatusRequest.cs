@@ -1,8 +1,8 @@
-using CrmSaas.Domain.Enums;
+﻿using CrmSaas.Domain.Enums;
 
 namespace CrmSaas.Application.Deals;
 
-public class DealStatusUpdateRequest
+public class UpdateDealStatusRequest
 {
     public DealStatus Status { get; set; }
 }

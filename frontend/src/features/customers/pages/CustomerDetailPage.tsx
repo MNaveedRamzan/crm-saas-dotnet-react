@@ -1,19 +1,30 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
 import { Card } from '../../../components/ui/Card';
 import { getCustomerById } from '../api/customersApi';
 import type { Customer } from '../types';
+
 import { DealsTable } from '../../deals/components/DealsTable';
 import { DealForm } from '../../deals/components/DealForm';
 import { createDeal, getDealsForCustomer } from '../../deals/api/dealsApi';
 import type { Deal, DealCreateRequest } from '../../deals/types';
+
+// ✅ Optional: Notes (agar tumne notesApi.ts banaya hai)
+// import {
+//   getCustomerNotes,
+//   addCustomerNote,
+//   deleteCustomerNote,
+//   type CustomerNote,
+// } from '../api/notesApi';
 
 export const CustomerDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const customerId = useMemo(() => {
     const n = Number(id);
-    return Number.isFinite(n) ? n : 0;
+    return Number.isFinite(n) && n > 0 ? n : 0;
   }, [id]);
 
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -22,42 +33,51 @@ export const CustomerDetailPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // ✅ Optional: Notes state
+  // const [notes, setNotes] = useState<CustomerNote[]>([]);
+  // const [noteText, setNoteText] = useState('');
+  // const [loadingNotes, setLoadingNotes] = useState(false);
+
   const load = async () => {
     if (!customerId) return;
 
     setLoading(true);
     setLoadError(null);
 
-    const [custRes, dealsRes] = await Promise.allSettled([
-      getCustomerById(customerId),
-      getDealsForCustomer(customerId),
-    ]);
+    try {
+      const [custRes, dealsRes] = await Promise.allSettled([
+        getCustomerById(customerId),
+        getDealsForCustomer(customerId),
+      ]);
 
-    if (custRes.status === 'fulfilled') {
-      setCustomer(custRes.value);
-    } else {
-      setCustomer(null);
-      const msg =
-        (custRes.reason?.response?.data?.message ??
-          custRes.reason?.message ??
-          'Failed to load customer') as string;
-      setLoadError((prev) => prev ?? msg);
-      console.error('getCustomerById failed:', custRes.reason);
+      if (custRes.status === 'fulfilled') {
+        setCustomer(custRes.value);
+      } else {
+        setCustomer(null);
+        const msg =
+          (custRes.reason?.response?.data?.message ??
+            custRes.reason?.response?.data ??
+            custRes.reason?.message ??
+            'Failed to load customer') as string;
+        setLoadError((prev) => prev ?? msg);
+        console.error('getCustomerById failed:', custRes.reason);
+      }
+
+      if (dealsRes.status === 'fulfilled') {
+        setDeals(dealsRes.value);
+      } else {
+        setDeals([]);
+        const msg =
+          (dealsRes.reason?.response?.data?.message ??
+            dealsRes.reason?.response?.data ??
+            dealsRes.reason?.message ??
+            'Failed to load deals') as string;
+        setLoadError((prev) => prev ?? msg);
+        console.error('getDealsForCustomer failed:', dealsRes.reason);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    if (dealsRes.status === 'fulfilled') {
-      setDeals(dealsRes.value);
-    } else {
-      setDeals([]);
-      const msg =
-        (dealsRes.reason?.response?.data?.message ??
-          dealsRes.reason?.message ??
-          'Failed to load deals') as string;
-      setLoadError((prev) => prev ?? msg);
-      console.error('getDealsForCustomer failed:', dealsRes.reason);
-    }
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -65,24 +85,34 @@ export const CustomerDetailPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
- const handleAddDeal = async (data: DealCreateRequest) => {
-  if (!customerId) return;
+  const handleAddDeal = async (data: DealCreateRequest) => {
+    if (!customerId) return;
 
-  setSubmitting(true);
-  try {
-    const created = await createDeal({ ...data, customerId });
+    setSubmitting(true);
+    try {
+      const created = await createDeal({ ...data, customerId });
 
-    // ✅ optimistic add
-    setDeals((prev) => [created, ...prev]);
+      // ✅ optimistic add
+      setDeals((prev) => [created, ...prev]);
 
-    // optional: background refresh (silently)
-    load().catch(() => {});
-  } finally {
-    setSubmitting(false);
-  }
-};
+      toast.success('Deal created');
 
-  if (!customerId) return <div>Invalid customer.</div>;
+      // ✅ optional refresh
+      load().catch(() => {});
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        'Failed to create deal';
+      toast.error(String(msg));
+      console.error('createDeal failed:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!customerId) return <div className="p-4">Invalid customer.</div>;
 
   return (
     <div className="space-y-4">
@@ -90,7 +120,7 @@ export const CustomerDetailPage: React.FC = () => {
         <Card title="Load Error">
           <div className="text-sm text-red-600">{loadError}</div>
           <div className="text-xs text-slate-500 mt-1">
-            Check console to see which API failed (customer or deals).
+            Console me check karo: customer API fail hua ya deals API.
           </div>
         </Card>
       )}
@@ -125,9 +155,13 @@ export const CustomerDetailPage: React.FC = () => {
         ) : deals.length ? (
           <DealsTable deals={deals} />
         ) : (
-          <div className="text-sm text-slate-500">No deals for this customer.</div>
+          <div className="text-sm text-slate-500">
+            No deals for this customer.
+          </div>
         )}
       </Card>
+
+      {/* ✅ OPTIONAL: Notes & Activities (agar notesApi.ts ready ho to bol do, main yahan enable kara dunga) */}
     </div>
   );
 };

@@ -2,10 +2,9 @@ import React from 'react';
 import type { Deal } from '../types';
 import { dealStatusOptions } from '../utils/dealStatus';
 
-
 type Props = {
   deals: Deal[];
-  onStatusChange: (dealId: number, newStatus: number, oldStatus: number) => void;
+  onStatusChange?: (dealId: number, newStatus: number, oldStatus: number) => void;
 };
 
 export const DealsTable: React.FC<Props> = ({ deals, onStatusChange }) => {
@@ -20,11 +19,13 @@ export const DealsTable: React.FC<Props> = ({ deals, onStatusChange }) => {
           <th className="px-3 py-2">Close Date</th>
         </tr>
       </thead>
+
       <tbody>
         {deals.map((d) => (
           <tr key={d.id} className="border-b last:border-b-0">
             <td className="px-3 py-2">{d.title}</td>
             <td className="px-3 py-2">{d.customerName ?? '-'}</td>
+
             <td className="px-3 py-2 text-right">
               {d.amount.toLocaleString('en-US', {
                 style: 'currency',
@@ -40,7 +41,7 @@ export const DealsTable: React.FC<Props> = ({ deals, onStatusChange }) => {
                 onChange={(e) => {
                   const newStatus = Number(e.target.value);
                   if (newStatus !== d.status) {
-                    onStatusChange(d.id, newStatus, d.status);
+                    onStatusChange?.(d.id, newStatus, d.status); // ✅ SAFE
                   }
                 }}
               >
@@ -53,7 +54,9 @@ export const DealsTable: React.FC<Props> = ({ deals, onStatusChange }) => {
             </td>
 
             <td className="px-3 py-2">
-              {d.closeDate ? new Date(d.closeDate).toLocaleDateString() : '-'}
+              {d.closeDate
+                ? new Date(d.closeDate).toLocaleDateString()
+                : '-'}
             </td>
           </tr>
         ))}

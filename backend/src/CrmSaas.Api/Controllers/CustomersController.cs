@@ -44,7 +44,7 @@ public class CustomersController : ControllerBase
         await _service.UpdateAsync(id, request);
         return NoContent();
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

@@ -8,6 +8,7 @@ import type { Customer, CreateCustomerDto } from '../types';
 export const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -24,14 +25,20 @@ export const CustomersPage: React.FC = () => {
   }, []);
 
   const handleCreate = async (data: CreateCustomerDto) => {
+  setSubmitting(true);
+  try {
     await createCustomer(data);
-    await load();
-  };
+    // reload list etc...
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   return (
     <div className="space-y-4">
       <Card title="Add Customer">
-        <CustomerForm onSubmit={handleCreate} />
+       <CustomerForm onSubmit={handleCreate} submitting={submitting} />
+
       </Card>
       <Card title="Customers">
         {loading ? (

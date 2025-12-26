@@ -16,8 +16,16 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=(localdb)\\mssqllocaldb;Database=CrmSaasDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql =>
+    {
+        sql.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null);
+    }));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -88,11 +96,13 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CRM SaaS API v1");
+    c.RoutePrefix = "swagger"; // default
+});
+
 
 app.UseHttpsRedirection();
 
@@ -102,5 +112,23 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    try
+    {
+        // 🔑 This creates database + tables if missing
+        await db.Database.MigrateAsync();
+
+        await DbSeeder.SeedAsync(db);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Database initialization failed");
+    }
+}
+
 
 app.Run();

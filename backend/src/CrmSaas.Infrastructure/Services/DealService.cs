@@ -1,6 +1,7 @@
 ﻿using CrmSaas.Application.Common;
 using CrmSaas.Application.Deals;
 using CrmSaas.Domain.Entities;
+using CrmSaas.Domain.Enums;
 using CrmSaas.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -153,12 +154,31 @@ public class DealService : IDealService
         };
     }
 
-    public async Task UpdateStatusAsync(int id, DealStatusUpdateRequest request)
+    public async Task<DealDto?> UpdateStatusAsync(int id, DealStatus status)
     {
-        var entity = await _db.Deals.FindAsync(id);
-        if (entity == null) throw new KeyNotFoundException("Deal not found");
+        var entity = await _db.Deals
+            .Include(d => d.Customer)
+            .FirstOrDefaultAsync(d => d.Id == id);
 
-        entity.Status = request.Status;
+        if (entity == null) return null;
+
+        entity.Status = status;
         await _db.SaveChangesAsync();
+
+        return ToDto(entity);
     }
+
+    private static DealDto ToDto(Deal d)
+    {
+        return new DealDto
+        {
+            Id = d.Id,
+            Title = d.Title,
+            Amount = d.Amount,
+            Status = d.Status,
+            CustomerId = d.CustomerId,
+            CustomerName = d.Customer?.Name
+        };
+    }
+
 }

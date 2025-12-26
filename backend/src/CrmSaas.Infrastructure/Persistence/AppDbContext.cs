@@ -1,6 +1,8 @@
 using CrmSaas.Domain.Entities;
 using CrmSaas.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using CrmSaas.Infrastructure.Persistence.Entities;
+
 namespace CrmSaas.Infrastructure.Persistence;
 
 public class AppDbContext : DbContext
@@ -12,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Deal> Deals => Set<Deal>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<CustomerNote> CustomerNotes => Set<CustomerNote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

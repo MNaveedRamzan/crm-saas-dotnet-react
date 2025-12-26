@@ -1,5 +1,6 @@
 ﻿using CrmSaas.Application.Common;
 using CrmSaas.Application.Deals;
+using CrmSaas.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,9 +48,18 @@ public class DealsController : ControllerBase
     }
 
     [HttpPatch("{id:int}/status")]
-    public async Task<ActionResult> UpdateStatus(int id, [FromBody] DealStatusUpdateRequest request)
+    public async Task<ActionResult<DealDto>> UpdateStatus(
+        int id,
+        [FromBody] UpdateDealStatusRequest req)
     {
-        await _service.UpdateStatusAsync(id, request);
-        return NoContent();
+        if (!Enum.IsDefined(typeof(DealStatus), req.Status))
+            return BadRequest("Invalid status");
+
+        var updated = await _service.UpdateStatusAsync(id, req.Status);
+        if (updated == null) return NotFound("Deal not found");
+
+        return Ok(updated);
     }
+
+
 }
