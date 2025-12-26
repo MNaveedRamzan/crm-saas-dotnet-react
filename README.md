@@ -104,13 +104,48 @@ Screenshots are available in the `/screenshots` folder.
 
 ## 🚀 Getting Started
 
+## 🐳 Run with Docker (Recommended)
+
+This project is fully dockerized and can be run with a single command.
+
+### Prerequisites
+- Docker Desktop installed
+- Docker engine running (Linux containers)
+
+### Start the full stack
+From the repository root:
+
+```bash
+docker compose up --build
+
+
 ### 1️⃣ Clone the repository
 ```bash
 git clone https://github.com/MNaveedRamzan/crm-saas-dotnet-react.git
 cd crm-saas-dotnet-react
 ```
+Open in browser
 
+Frontend: http://localhost:5173
+
+API (Swagger): http://localhost:5240/swagger
 ---
+Docker setup includes:
+
+ASP.NET Core .NET 8 API
+
+React frontend served via Nginx
+
+SQL Server container
+
+Replace that section with:
+## 🔧 Configuration
+
+The frontend uses environment variables for API configuration.
+
+```env
+VITE_API_BASE_URL=http://localhost:5240/api
+
 
 ## ⚙ Backend Setup
 
